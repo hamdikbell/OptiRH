@@ -1,0 +1,310 @@
+{{ form_start(form, {'attr': {'id': 'event-form', 'class': 'form-horizontal', 'enctype': 'multipart/form-data','novalidate': 'novalidate' }}) }}
+    <div class="row g-3">
+        <!-- Colonne gauche -->
+        <div class="col-md-6">
+            <!-- Titre -->
+            <div class="mb-3 input-with-icon">
+                <i class="fas fa-heading input-icon"></i>
+                {{ form_label(form.titre, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-sm', 'id': 'evenement_titre'}}) }}
+                <div class="text-danger">
+                    {{ form_errors(form.titre) }}
+                </div>
+            </div>
+
+            <!-- Lieu -->
+            <div class="mb-3 input-with-icon">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                {{ form_label(form.lieu, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.lieu, {'attr': {'class': 'form-control form-control-sm', 'id': 'event_lieu'}}) }}
+                <div class="text-danger">
+                    {{ form_errors(form.lieu) }}
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="row g-2">
+                <div class="col-md-6 mb-3 input-with-icon">
+                    <i class="far fa-calendar-alt input-icon"></i>
+                    {{ form_label(form.date_debut, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.date_debut, {'attr': {'class': 'form-control form-control-sm flatpickr-date','id': 'evenement_date_debut'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.date_debut) }}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3 input-with-icon">
+                    <i class="far fa-calendar-alt input-icon"></i>
+                    {{ form_label(form.date_fin, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.date_fin, {'attr': {'class': 'form-control form-control-sm flatpickr-date','id': 'evenement_date_fin'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.date_fin) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Heure -->
+            <div class="mb-3 input-with-icon">
+                <i class="far fa-clock input-icon"></i>
+                {{ form_label(form.heure, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.heure, {'attr': {'class': 'form-control form-control-sm flatpickr-time','id': 'evenement_heure'}}) }}
+                <div class="text-danger">
+                    {{ form_errors(form.heure) }}
+                </div>
+            </div>
+             <!-- Nombre de personnes -->
+            <div class="mb-3 input-with-icon">
+                <i class="fas fa-users input-icon"></i>
+                {{ form_label(form.nbr_personnes, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.nbr_personnes, {'attr': {'class': 'form-control form-control-sm'}}) }}
+                <div class="text-danger">
+                    {{ form_errors(form.nbr_personnes) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne droite -->
+        <div class="col-md-6">
+            <!-- Type et Modalité -->
+            <div class="row g-2">
+                <div class="col-md-6 mb-3 input-with-icon">
+                    <i class="fas fa-laptop-house input-icon"></i>
+                    {{ form_label(form.modalite, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.modalite, {'attr': {'class': 'form-select form-select-sm select2', 'id': 'event_modalite'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.modalite) }}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3 input-with-icon">
+                    <i class="fas fa-tags input-icon"></i>
+                    {{ form_label(form.type, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.type, {'attr': {'class': 'form-select form-select-sm select2','id': 'evenement_type'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.type) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <!-- Image -->
+            <div class="mb-3">
+                <label class="form-label">Image</label>
+                <div class="custom-file-upload">
+                    <button type="button" class="btn btn-sm btn-outline-primary file-select-btn">
+                        <i class="fas fa-image me-2"></i>Choisir une image
+                    </button>
+                    <span class="file-name ms-2">
+                        {% if form.vars.value.image %}
+                            {{ form.vars.value.image }}
+                        {% else %}
+                            Aucun fichier sélectionné
+                        {% endif %}
+                    </span>
+                    {{ form_widget(form.image, {'attr': {'class': 'file-input', 'style': 'display:none;'}}) }}
+                </div>
+
+                <div class="text-danger">
+                    {{ form_errors(form.image) }}
+                </div>
+            </div>
+
+
+            <!-- Prix -->
+            <div class="mb-3 input-with-icon">
+                <i class="fas fa-euro-sign input-icon"></i>
+                {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-group input-group-sm">
+                    {{ form_widget(form.prix, {'attr': {'class': 'form-control','id': 'evenement_prix'}}) }}
+                    <span class="input-group-text bg-transparent">€</span>
+                </div>
+                <div class="text-danger">
+                    {{ form_errors(form.prix) }}
+                </div>
+            </div>
+           
+
+
+            <!-- Coordonnées -->
+                <div class=" mb-3 geo-input-group input-with-icon">
+                    <i class="fas fa-globe-americas input-icon"></i>
+                    {{ form_label(form.latitude, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.latitude, {'attr': {'class': 'form-control form-control-sm'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.latitude) }}
+                    </div>
+                </div>
+                
+                <div class="mb-3 geo-input-group input-with-icon">
+                    <i class="fas fa-globe-americas input-icon"></i>
+                    {{ form_label(form.longitude, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.longitude, {'attr': {'class': 'form-control form-control-sm'}}) }}
+                    <div class="text-danger">
+                        {{ form_errors(form.longitude) }}
+                    </div>
+                </div>
+        </div>
+
+        <!-- Description -->
+        
+
+
+
+         <div class="col-12 mb-3 input-with-icon">
+            <i class="fas fa-align-left input-icon textarea-icon"></i>
+            {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-sm', 'rows': '3', 'id': 'evenement_description'}}) }}
+            <div class="text-danger">
+                {{ form_errors(form.description) }}
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="generate-description-btn">
+                <i class="mdi mdi-robot-outline me-1"></i> Générer par IA
+            </button>
+        </div>
+
+        <!-- Boutons -->
+        <div class="col-12 text-end mt-2">
+            <a href="{{ path('app_evenement_index') }}" class="btn btn-sm btn-cancel me-2">
+                <i class="fas fa-times-circle me-1"></i> Annuler
+            </a>
+            <button type="submit" class="btn btn-sm btn-submit">
+                <i class="fas fa-save me-1"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+{{ form_end(form) }}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('css/Evenement/AjouterEvenement.css') }}">    
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de l'upload de fichier
+            const fileInput = document.querySelector('.file-input');
+            const fileSelectBtn = document.querySelector('.file-select-btn');
+            const fileNameSpan = document.querySelector('.file-name');
+            const modaliteSelect = document.getElementById('{{ form.modalite.vars.id }}'); // Meilleure façon de cibler
+            const lieuInput = document.getElementById('{{ form.lieu.vars.id }}');
+
+             // Fonction de gestion du changement
+            function updateLieuField() {
+                if (modaliteSelect.value === 'En ligne') {
+                    lieuInput.value = 'En ligne';
+                    lieuInput.readOnly = true;
+                    lieuInput.classList.add('bg-light');
+                } else {
+                    lieuInput.readOnly = false;
+                    lieuInput.classList.remove('bg-light');
+                    if (lieuInput.value === 'En ligne') {
+                        lieuInput.value = '';
+                    }
+                }
+            }
+
+fileSelectBtn.addEventListener('click', function () {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+        fileNameSpan.textContent = this.files[0].name;
+        fileNameSpan.style.color = '#28a745';
+    } else {
+        fileNameSpan.textContent = 'Aucun fichier sélectionné';
+        fileNameSpan.style.color = '#6c757d';
+    }
+});
+    // Écouteur d'événement
+    modaliteSelect.addEventListener('change', updateLieuField);
+    
+    // Appliquer au chargement si nécessaire
+    updateLieuField();
+        
+
+           
+
+            
+        });
+
+
+
+        $(document).ready(function() {
+    $('#generate-description-btn').on('click', function() {
+        var titre = $('#evenement_titre').val();
+        var lieu = $('#event_lieu').val(); // Tu avais déjà cet ID
+        var type = $('#evenement_type').val();
+        var modalite = $('#event_modalite').val(); // Tu avais déjà cet ID
+        var descriptionField = $('#evenement_description'); // Cibler le champ de description
+
+        if (!titre) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Attention',
+                text: 'Veuillez d\'abord saisir au moins le titre de l\'événement.',
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Génération en cours...',
+            text: 'L\'IA travaille sur une description pour vous.',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '{{ path('app_evenement_generer_description') }}',
+            method: 'POST',
+            data: {
+                titre: titre,
+                lieu: lieu,
+                type: type,
+                modalite: modalite,
+            },
+            dataType: 'json',
+            success: function(response) {
+                Swal.close();
+                if (response.description) {
+                    descriptionField.val(response.description);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Description générée !',
+                        text: 'La description a été générée par l\'IA.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else if (response.error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: response.error,
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Avertissement',
+                        text: 'La génération de la description a échoué.',
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.close();
+                console.error("Erreur AJAX:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: 'Une erreur s\'est produite lors de la communication avec le serveur.',
+                });
+            }
+        });
+    });
+});
+    </script>
+    
+{% endblock %}

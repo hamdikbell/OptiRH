@@ -1,0 +1,130 @@
+
+{% block body %}
+<meta charset="UTF-8">
+<title>Billet - {{ evenement.titre }}</title>
+
+<style>
+    
+    .ticket {
+        width: 1200px;
+        height: 400px;
+        background: #f8fafc;
+
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        overflow: hidden; /* Clearfix for floated elements */
+        position: relative;
+    }
+    .left-panel {
+        width: 43%;
+        padding: 40px;
+        float: left; /* Use float instead of flex */
+        box-sizing: border-box;
+        position: relative;
+        background: #f8fafc;
+
+    }
+    .right-panel {
+        width: 57%;
+        padding: 40px;
+        float: left; /* Use float instead of flex */
+        box-sizing: border-box;
+        background: #f8fafc;
+    }
+    .separator-image {
+        position: absolute;
+        left: 43%;
+        top: 0;
+        height: 100%;
+        z-index: 10;
+    }
+    
+    .event-title {
+        font-size: 24pt;
+        color: #1e3a8a;
+        margin: 0 0 15px;
+    }
+    .event-type {
+        background: #2563eb;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12pt;
+    }
+    .personal-title {
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 14pt;
+        margin-bottom: 15px;
+    }
+    .personal-title::after {
+        content: "";
+        display: block;
+        width: 50px;
+        height: 3px;
+        background: #2563eb;
+        margin-top: 8px;
+    }
+    .user-info {
+        font-size: 11pt;
+        margin-bottom: 10px;
+    }
+    .notice {
+        font-size: 10pt;
+        color: #64748b;
+        text-align: left;
+        font-style: italic;
+    }
+</style>
+<div class="ticket">
+    <div class="left-panel">
+        <span class="event-type">{{ evenement.type }}</span>
+        <h1 class="event-title">{{ evenement.titre }}</h1>
+        <div class="event-details">
+            <div style="margin-bottom: 12px;">
+                <span style="margin-right: 10px;">
+                    <img src="data:image/png;base64,{{ calendar_icon }}" class="detail-icon" alt="Calendar" width="30" height="30">
+                </span>
+                Du {{ evenement.dateDebut|date('d/m/Y') }} au {{ evenement.dateFin|date('d/m/Y') }}
+            </div>
+            <div style="margin-bottom: 12px;">
+                <span style="margin-right: 10px;">
+                    <img src="data:image/png;base64,{{ clock_icon }}" class="detail-icon" alt="Clock" width="30" height="30">
+                </span>
+                {{ evenement.heure | date ('H:i') }}
+            </div>
+            <div style="margin-bottom: 12px;">
+                <span style="margin-right: 10px;">
+                    <img src="data:image/png;base64,{{ location_icon }}" class="detail-icon" alt="Location" width="30" height="30">
+                </span>
+                {{ evenement.lieu }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Positioned absolutely to not affect layout flow -->
+    <img src="data:image/png;base64,{{ ligne }}" alt="ligne" class="separator-image">
+
+    <div class="right-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="personal-title">VOTRE BILLET
+                <img src="data:image/png;base64,{{ logo }}" alt="Logo" style="height: 60px; margin-left: 250px;">
+            </h3>
+        </div>
+        <div class="user-info">
+            <strong>Nom:</strong> {{ reservation.lastName }}<br>
+            <strong>Prénom:</strong> {{ reservation.firstName }}<br>
+        </div>
+        <div class="barcode">
+            <img src="data:image/png;base64,{{ barcode }}" alt="Code-barres" width="200" height="50">
+        </div>
+        <p class="notice">Ce billet est personnel et non transférable</p>
+        <div class="sdg-icons">
+            <img src="data:image/png;base64,{{ sdg_icons['8'] }}" alt="Icon 8" width="50" height="50">
+            <img src="data:image/png;base64,{{ sdg_icons['9'] }}" alt="Icon 9" width="50" height="50">
+            <img src="data:image/png;base64,{{ sdg_icons['10'] }}" alt="Icon 10" width="50" height="50">
+            <img src="data:image/png;base64,{{ sdg_icons['12'] }}" alt="Icon 12" width="50" height="50">
+        </div>
+    </div>
+</div>
+{% endblock %}

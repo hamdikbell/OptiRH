@@ -1,0 +1,108 @@
+/* offreStyle.css corrigé */
+.main-content {
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+}
+
+/* Header spécifique au contenu principal */
+.main-content .header {
+    -fx-text-fill: #01224C;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 20px 0;
+}
+
+/* Styles uniquement pour les boutons du contenu principal */
+.main-content .button {
+    -fx-background-color: #021E33;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 20px;
+    -fx-pref-width: 120px;
+    -fx-font-size: 14px;
+}
+
+.main-content .button:hover {
+    -fx-background-color: #012E67;
+}
+
+/* TableView dans le contenu principal */
+.main-content .table-view {
+    -fx-background-color: #9BADc0;
+    -fx-border-color: #01224C;
+    -fx-border-radius: 5px;
+    -fx-table-cell-border-color: transparent;
+}
+
+.main-content .table-view .column-header {
+    -fx-background-color: #012E67;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.main-content .table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+}
+
+.main-content .table-view .table-row-cell {
+    -fx-border-color: #01224C;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: #ffffff;
+}
+
+.main-content .table-view .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.main-content .table-view .table-cell {
+    -fx-padding: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Styles spécifiques pour les colonnes */
+.main-content .table-column {
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Champs de texte uniquement dans le contenu principal */
+.main-content .text-field {
+    -fx-pref-width: 200px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #01224C;
+    -fx-background-color: white;
+    -fx-padding: 8px;
+}
+
+/* Labels dans le contenu principal */
+.main-content .label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #01224C;
+}
+
+/* Boutons d'action spécifiques */
+.main-content .action-btn {
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+}
+
+.main-content .delete-btn {
+    -fx-background-color: #1a6dda;
+    -fx-text-fill: white;
+}
+
+/* Conserver le style du sidebar */
+.menu {
+}
+
+.menu .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-pref-width: 200px;
+}
+
+.menu .button:hover {
+    -fx-background-color: #012E67;
+}

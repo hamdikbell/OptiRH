@@ -1,0 +1,4 @@
+/OptiRH/Web/OptiRH/config/google/credentials.json
+.env
+.env.local
+http-client.private.env.json

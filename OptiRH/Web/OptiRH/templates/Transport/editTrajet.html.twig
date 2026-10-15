@@ -1,0 +1,182 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Modifier Trajet{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { page_title: 'Modifier Trajet' }) }}
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirmation avant soumission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Confirmer la modification',
+                text: 'Êtes-vous sûr de vouloir modifier ce trajet ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, enregistrer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<style>
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <h4 class="page-title">Modifier Trajet #{{ trajet.id }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, { 'attr': {'novalidate': 'novalidate'} }) }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.type, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.type, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.type.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.type) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.station, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.station, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.station.vars.errors|length ? ' is-invalid' : ''),
+                                    'maxlength': 50
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.station) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.depart, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.depart, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.depart.vars.errors|length ? ' is-invalid' : ''),
+                                    'maxlength': 50
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.depart) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.arrive, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.arrive, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.arrive.vars.errors|length ? ' is-invalid' : ''),
+                                    'maxlength': 50
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.arrive) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ form_label(form.longitudeDepart, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.longitudeDepart, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.longitudeDepart.vars.errors|length ? ' is-invalid' : ''),
+                                    'step': '0.000001'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.longitudeDepart) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form_label(form.latitudeDepart, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.latitudeDepart, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.latitudeDepart.vars.errors|length ? ' is-invalid' : ''),
+                                    'step': '0.000001'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.latitudeDepart) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form_label(form.longitudeArrivee, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.longitudeArrivee, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.longitudeArrivee.vars.errors|length ? ' is-invalid' : ''),
+                                    'step': '0.000001'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.longitudeArrivee) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form_label(form.latitudeArrivee, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.latitudeArrivee, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.latitudeArrivee.vars.errors|length ? ' is-invalid' : ''),
+                                    'step': '0.000001'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.latitudeArrivee) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="mdi mdi-content-save"></i> Enregistrer
+                        </button>
+                        <a href="{{ path('app_transport_trajet_index') }}" class="btn btn-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

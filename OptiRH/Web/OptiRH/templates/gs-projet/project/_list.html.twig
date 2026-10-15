@@ -1,0 +1,48 @@
+{% for project in projects %}
+    <tr data-id="{{ project.id }}">
+        <td>
+            <a href="{{ path('gs-projet_project_show', {id: project.id}) }}" 
+               class="text-dark fw-semibold text-decoration-none">
+                {{ project.nom }}
+            </a>
+        </td>
+        <td class="text-muted small">{{ project.description|u.truncate(100, '...') }}</td>
+        <td>
+            <span class="badge bg-{{ project.status|status_badge }} rounded-pill">
+                {{ project.status }}
+            </span>
+        </td>
+        <td class="text-muted small">{{ project.createdAt|date('d/m/Y') }}</td>
+        <td>
+            <div class="d-flex gap-2">
+                <a href="{{ path('gs-projet_project_show', {id: project.id}) }}" 
+                   class="btn btn-sm btn-outline-secondary"
+                   title="Voir détails">
+                    <i class="mdi mdi-eye-outline"></i>
+                </a>
+                <a href="{{ path('gs-projet_project_edit', {id: project.id}) }}" 
+                   class="btn btn-sm btn-outline-primary"
+                   title="Modifier">
+                    <i class="mdi mdi-pencil-outline"></i>
+                </a>
+                <form method="post" action="{{ path('gs-projet_project_delete', {'id': project.id}) }}" 
+                      class="delete-project-form"
+                      data-project-name="{{ project.nom }}"
+                      data-confirm="Êtes-vous sûr de vouloir supprimer définitivement le projet '{{ project.nom }}' ?">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm delete-project" 
+                            data-id="{{ project.id }}" 
+                            data-name="{{ project.nom }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="5" class="text-center py-4 text-muted">
+            Aucun projet trouvé
+        </td>
+    </tr>
+{% endfor %}

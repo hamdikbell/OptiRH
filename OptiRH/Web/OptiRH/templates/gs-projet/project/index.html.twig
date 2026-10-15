@@ -1,0 +1,188 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Liste des projets{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { page_title: 'Gestion des projets' }) }}
+    
+{% endblock %}
+
+{% block body %}
+<div class="col-md-6">
+            <a href="{{ path('gs-projet_project_new') }}" class="btn btn-purple rounded-pill w-md waves-effect waves-light">
+                <i class="mdi mdi-plus me-2"></i>
+                Créer un projet
+            </a>
+        </div>
+<div class="row mb-4">
+    <div><br></div>
+    <div class="col-md-12">
+        <form id="project-filter-form" method="get" class="row g-2 align-items-center">
+            <!-- Champ Recherche -->
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Rechercher par nom ou description..." 
+                       value="{{ current_filters.search }}">
+            </div>
+            
+            <!-- Filtre Statut -->
+            <div class="col-md-5">
+                <select name="status" class="form-select" id="status-filter">
+                    <option value="">Tous les statuts</option>
+                    <option value="{{ constant('App\\Entity\\GsProjet\\Project::STATUS_ACTIVE') }}" 
+                            {{ current_filters.status == constant('App\\Entity\\GsProjet\\Project::STATUS_ACTIVE') ? 'selected' }}>
+                        Actif
+                    </option>
+                    <option value="{{ constant('App\\Entity\\GsProjet\\Project::STATUS_INACTIVE') }}"
+                            {{ current_filters.status == constant('App\\Entity\\GsProjet\\Project::STATUS_INACTIVE') ? 'selected' }}>
+                        En Cour
+                    </option>
+                    <option value="{{ constant('App\\Entity\\GsProjet\\Project::STATUS_COMPLETED') }}"
+                            {{ current_filters.status == constant('App\\Entity\\GsProjet\\Project::STATUS_COMPLETED') ? 'selected' }}>
+                        Terminé
+                    </option>
+                    <option value="{{ constant('App\\Entity\\GsProjet\\Project::STATUS_DELAYED') }}"
+                            {{ current_filters.status == constant('App\\Entity\\GsProjet\\Project::STATUS_DELAYED') ? 'selected' }}>
+                        En retard
+                    </option>
+                </select>
+            </div>
+            
+            <!-- Bouton Filtrer -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive" id="project-table-container">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nom du projet</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="project-list-body">
+            {% include 'gs-projet/project/_list.html.twig' with { projects: projects } %}
+        </tbody>
+    </table>
+
+    {% if projects is not empty and projects.getPageCount() > 1 %}
+        <div id="project-pagination" class="mt-3">
+            {{ knp_pagination_render(projects, '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig') }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ parent() }}
+<script src="{{ asset('/libs/sweetalert2/sweetalert2.all.min.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('project-filter-form');
+    const statusFilter = document.getElementById('status-filter');
+    
+    // Soumission du formulaire (pour le bouton Filtrer)
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitFilters();
+        });
+    }
+    
+    // Auto-soumission quand on change le statut
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            submitFilters();
+        });
+    }
+    
+    function submitFilters() {
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData);
+        
+        // Rechargement complet de la page avec les nouveaux paramètres
+        window.location.href = `?${params.toString()}`;
+    }
+
+    // ... (gardez votre code existant pour la suppression)
+    const initDeleteHandlers = () => {
+        document.querySelectorAll('.delete-project-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const projectName = form.dataset.projectName;
+                const confirmMessage = form.dataset.confirm;
+
+                const { isConfirmed } = await Swal.fire({
+                    title: 'Confirmer la suppression',
+                    html: confirmMessage,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler'
+                });
+
+                if (!isConfirmed) return;
+
+                const button = form.querySelector('button[type="submit"]');
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Suppression...';
+                button.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Erreur lors de la suppression');
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succès !',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        const row = form.closest('tr');
+                        row.style.transition = 'opacity 0.5s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 500);
+                    });
+
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Échec de la suppression',
+                        text: error.message,
+                        confirmButtonText: 'OK'
+                    });
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                }
+            });
+        });
+    };
+
+    initDeleteHandlers();
+});
+</script>
+{% endblock %}

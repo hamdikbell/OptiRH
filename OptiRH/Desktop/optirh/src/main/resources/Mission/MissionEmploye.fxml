@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ProgressIndicator?>
+
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.AnchorPane?>
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.nexus.Controllers.Mission.MissionEmployeController">
+
+    <!-- Left Region - Sidebar -->
+    <left>
+        <AnchorPane fx:id="sideBar" prefWidth="200.0" />
+    </left>
+
+    <!-- Center Region - Main Content -->
+    <center>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <!-- Header Section -->
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <TextField fx:id="emailField" promptText="Email employé" prefWidth="250.0"/>
+                <Button fx:id="loadMissionsButton" text="Charger missions"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+            </HBox>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="Filtrer par statut:"/>
+                <ComboBox fx:id="statusFilterCombo" prefWidth="120"/>
+            </HBox>
+
+            <!-- Loading Indicator -->
+            <ProgressIndicator fx:id="loadingSpinner" visible="false"/>
+
+            <!-- Calendar Controls -->
+            <HBox spacing="15.0" alignment="CENTER">
+                <Button fx:id="previousMonthButton" text="&lt;"
+                        style="-fx-font-weight: bold; -fx-font-size: 14pt;"/>
+                <Label fx:id="monthYearLabel"
+                       style="-fx-font-size: 16pt; -fx-font-weight: bold;"/>
+                <Button fx:id="nextMonthButton" text="&gt;"
+                        style="-fx-font-weight: bold; -fx-font-size: 14pt;"/>
+            </HBox>
+
+            <!-- Filter Section -->
+            <HBox spacing="10.0" alignment="CENTER">
+                <Label text="Filtres :" style="-fx-font-weight: bold;"/>
+                <Button fx:id="filterTodayButton" text="Aujourd'hui"
+                        style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                <Button fx:id="filterThisMonthButton" text="Ce mois"
+                        style="-fx-background-color: #009688; -fx-text-fill: white;"/>
+                <Button fx:id="clearFilterButton" text="Réinitialiser"
+                        style="-fx-background-color: #9E9E9E; -fx-text-fill: white;"/>
+            </HBox>
+
+            <!-- Calendar Grid -->
+            <GridPane fx:id="calendarGrid"
+                      hgap="5.0"
+                      vgap="5.0"
+                      prefWidth="1000.0"
+                      style="-fx-padding: 10;">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                    <ColumnConstraints percentWidth="14.28"/>
+                </columnConstraints>
+            </GridPane>
+        </VBox>
+    </center>
+
+</BorderPane>

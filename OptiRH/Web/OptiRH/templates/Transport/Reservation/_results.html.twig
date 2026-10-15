@@ -1,0 +1,46 @@
+{% if vehicules is empty %}
+    <div class="alert alert-warning">
+        Aucun véhicule disponible pour ce trajet
+    </div>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-hover table-centered table-nowrap mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Type</th>
+                    <th>Trajet</th>
+                    <th>Disponibilité</th>
+                    <th>Places</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicule in vehicules %}
+                {% set disponibilite = vehicule.nbrplace > 0 ? 'Disponible' : 'Indisponible' %}
+                <tr>
+                    <td>
+                        <span class="badge bg-{{ vehicule.type == 'Bus' ? 'info' : 'success' }}">
+                            {{ vehicule.type }}
+                        </span>
+                    </td>
+                    <td>{{ vehicule.trajet.depart }} → {{ vehicule.trajet.arrive }}</td>
+                    <td>
+                        <span class="badge bg-{{ disponibilite == 'Disponible' ? 'success' : 'danger' }}">
+                            {{ disponibilite }}
+                        </span>
+                    </td>
+                    <td class="places">{{ vehicule.nbrplace }}</td>
+                    <td>
+                        <form action="{{ path('app_transport_reservation_reserve', {id: vehicule.id}) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-primary reserve-btn" 
+                                    {{ vehicule.nbrplace <= 0 ? 'disabled' : '' }}>
+                                <i class="mdi mdi-calendar-check"></i> Réserver
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

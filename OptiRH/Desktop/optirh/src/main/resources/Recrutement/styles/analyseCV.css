@@ -1,0 +1,73 @@
+/* ========== AMÉLIORATIONS TYPOGRAPHIQUES ========== */
+* {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-smoothing-type: gray; /* Meilleur rendu des polices */
+}
+
+/* ========== BOUTON ANALYSE ========== */
+.analyse-button {
+    -fx-background-color: #1a6dda;
+    -fx-text-fill: white;
+    -fx-font-weight: 700; /* Plus cohérent avec les valeurs CSS standard */
+    -fx-padding: 12px 28px; /* Format plus lisible */
+    -fx-effect: dropshadow(three-pass-box, rgba(26,109,218,0.2), 6, 0, 0, 1);
+    transition: all 0.3s ease; /* Transition fluide */
+}
+
+.analyse-button:hover {
+    -fx-background-color: #1557b0; /* Variation plus cohérente */
+    -fx-effect: dropshadow(three-pass-box, rgba(26,109,218,0.3), 8, 0, 1, 2);
+    -fx-cursor: hand;
+}
+
+/* ========== TABLEAU AMÉLIORÉ ========== */
+.table-view {
+    -fx-pref-height: 400px; /* Meilleur ratio hauteur/largeur */
+    -fx-background-color: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+    -fx-border-color: #d3d9df;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);
+    -fx-padding: 8px 0;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #e3f2fd; /* Couleur de sélection plus subtile */
+}
+
+/* ========== EFFETS DE SURVOL DYNAMIQUES ========== */
+.combo-box:hover,
+.list-view:hover,
+.button:hover {
+    -fx-border-color: #1a6dda;
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
+    transition: all 0.2s ease-in-out;
+}
+
+/* ========== ÉTATS FOCUS ========== */
+.combo-box:focused,
+.text-field:focused {
+    -fx-border-color: #1a6dda !important;
+    -fx-border-width: 2px;
+    -fx-effect: innershadow(gaussian, rgba(26,109,218,0.15), 5, 0, 0, 2);
+}
+
+
+
+.menu .label {
+    -fx-font-size: 13px;
+    -fx-letter-spacing: 0.5px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .main-content {
+        -fx-padding: 15px !important;
+    }
+
+    .table-view {
+        -fx-pref-width: 100% !important;
+    }
+}

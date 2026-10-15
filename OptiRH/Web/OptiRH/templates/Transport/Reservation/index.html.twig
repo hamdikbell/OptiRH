@@ -1,0 +1,245 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Réservation de trajets{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .fullscreen-map-container {
+            height: 70vh;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { page_title: 'Réservation de trajets' }) }}
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3 d-flex justify-content-between">
+                    <div>
+                        <button class="btn btn-info" id="showReservationsBtn">
+                            <i class="mdi mdi-calendar-text me-1"></i> Mes Réservations
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" id="showMapBtn">
+                            <i class="mdi mdi-map-marker-radius me-1"></i> Afficher la carte
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal pour la carte -->
+                <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Carte des trajets</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-0">
+                                <div class="fullscreen-map-container">
+                                    <div id="map"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="mdi mdi-close me-1"></i> Fermer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barre de recherche -->
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <input type="text" id="depart" class="form-control" placeholder="Point de départ" required>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" id="arrive" class="form-control" placeholder="Point d'arrivée" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="searchBtn" class="btn btn-primary w-100">
+                            <i class="mdi mdi-magnify me-1"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Résultats -->
+                <div id="resultsContainer">
+                    <div class="alert alert-info">
+                        Veuillez entrer au moins un point de départ ou d'arrivée
+                    </div>
+                </div>
+
+                <!-- Section Mes Réservations (cachée par défaut) -->
+                <div id="myReservationsContainer" style="display: none;">
+                    <h4 class="mb-3">Mes Réservations</h4>
+                    <div id="reservationsList">
+                        <div class="alert alert-info">Chargement en cours...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ parent() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Configuration globale
+const MAP_CONFIG = {
+    defaultView: [36.8065, 10.1815],
+    defaultZoom: 7,
+    tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    let map = null; // Variable pour stocker la carte
+    
+    // Gestion du bouton d'affichage de la carte
+    document.getElementById('showMapBtn').addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+        
+        // Initialiser la carte seulement si elle n'existe pas encore
+        if (!map) {
+            map = L.map('map').setView(MAP_CONFIG.defaultView, MAP_CONFIG.defaultZoom);
+            L.tileLayer(MAP_CONFIG.tileLayer, { 
+                attribution: MAP_CONFIG.attribution 
+            }).addTo(map);
+            
+            // Activer les interactions
+            map.scrollWheelZoom.enable();
+        }
+        
+        // Toujours redimensionner et afficher la modal
+        setTimeout(() => {
+            map.invalidateSize();
+            modal.show();
+        }, 100);
+    });
+
+    // Gestion de la recherche
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        const depart = document.getElementById('depart').value;
+        const arrive = document.getElementById('arrive').value;
+
+        if (!depart && !arrive) {
+            const errorHtml = `
+                <div class="alert alert-warning alert-dismissible fade show">
+                    Veuillez saisir au moins un point de départ ou d'arrivée
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('resultsContainer').innerHTML = errorHtml;
+            return;
+        }
+
+        document.getElementById('myReservationsContainer').style.display = 'none';
+        document.getElementById('resultsContainer').style.display = 'block';
+
+        fetch(`{{ path('app_transport_reservation_search') }}?depart=${encodeURIComponent(depart)}&arrive=${encodeURIComponent(arrive)}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('resultsContainer').innerHTML = html;
+            });
+    });
+
+    // Bouton "Mes Réservations"
+    document.getElementById('showReservationsBtn').addEventListener('click', function() {
+        const container = document.getElementById('myReservationsContainer');
+        const isVisible = container.style.display !== 'none';
+        
+        if (!isVisible) {
+            fetch('{{ path("app_transport_reservation_list") }}')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('reservationsList').innerHTML = html;
+                    container.style.display = 'block';
+                    document.getElementById('resultsContainer').style.display = 'none';
+                });
+        } else {
+            container.style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+    });
+
+    // Recherche avec la touche Entrée
+    ['depart', 'arrive'].forEach(id => {
+        document.getElementById(id).addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+    });
+});
+
+function deleteReservation(reservationId) {
+    if (confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i> Traitement...';
+
+        fetch(`/transport/reservation/${reservationId}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                '_token': '{{ csrf_token('delete_reservation') }}'
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('showReservationsBtn').click();
+                showAlert('success', 'Réservation annulée avec succès');
+            } else {
+                throw new Error(data.error || 'Erreur inconnue');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showAlert('danger', `Échec de l'annulation: ${error.message}`);
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = '<i class="mdi mdi-delete"></i> Annuler';
+        });
+    }
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    const container = document.getElementById('myReservationsContainer');
+    container.prepend(alert);
+    
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 150);
+    }, 5000);
+}
+</script>
+{% endblock %}

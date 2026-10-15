@@ -1,0 +1,165 @@
+{# templates/front/reclamation/reponses.html.twig #}
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { page_title: 'details de réclamations' }) }}
+{% endblock %}
+
+{% block title %}Réponses à la Réclamation #{{ reclamation.id }}{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <a href="{{ path('front_reclamations') }}" class="btn btn-secondary">
+                            <i class="mdi mdi-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                    <h4 class="page-title">Réponses à la Réclamation #{{ reclamation.id }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="header-title mb-3">Détails de la Réclamation</h4>
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <p>{{ reclamation.description }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="font-weight-bold">Type :</h6>
+                            <p>{{ reclamation.type }}</p>
+                        </div>                        
+                        <div class="mb-3">
+                            <strong>Date:</strong> {{ reclamation.date|date('d/m/Y H:i') }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Statut:</strong>
+                            <span class="badge bg-{{ reclamation.status == 'Résolue' ? 'success' : (reclamation.status == 'En cours' ? 'info' : 'warning') }}">
+                            {{ reclamation.status }}
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="header-title mb-3">Réponses</h4>
+
+                        {% if reclamation.reponses|length > 0 %}
+                            {% for reponse in reclamation.reponses %}
+                                <div class="border p-3 mb-3 rounded">
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Réponse #{{ loop.index }}</h5>
+                                        <small class="text-muted">{{ reponse.date|date('d/m/Y H:i') }}</small>
+                                    </div>
+                                    <p>{{ reponse.description }}</p>
+
+                                    <div class="rating-section mt-2">
+                                        <form method="post" action="{{ path('front_rate_reponse', {'id': reponse.id}) }}">
+                                            <div class="mb-2">
+                                                <strong>Évaluer cette réponse:</strong>
+                                            </div>
+                                            <div class="star-rating">
+                                                {% for i in 5..1 %}
+                                                    <input type="radio" id="star{{ i }}-{{ reponse.id }}" name="rating" value="{{ i }}"
+                                                           {% if reponse.rating == i %}checked{% endif %}>
+                                                    <label for="star{{ i }}-{{ reponse.id }}">★</label>
+                                                {% endfor %}
+                                            </div>
+                                            
+                                            <!-- Champ de commentaire conditionnel -->
+                                            <div id="commentaire-container-{{ reponse.id }}" class="mt-3" style="display: none;">
+                                                <div class="form-group">
+                                                    <label for="commentaire-{{ reponse.id }}" class="form-label">Commentaire (obligatoire pour les notes 1-2 étoiles):</label>
+                                                    <textarea class="form-control" id="commentaire-{{ reponse.id }}" name="commentaire" rows="3" required></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Affichage du commentaire existant -->
+                                            {% if reponse.commentaire %}
+                                                <div class="mt-3">
+                                                    <strong>Votre commentaire:</strong>
+                                                    <p class="text-muted">{{ reponse.commentaire }}</p>
+                                                </div>
+                                            {% endif %}
+
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                                <i class="mdi mdi-star"></i> Noter
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">Aucune réponse pour cette réclamation</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            font-size: 1.5em;
+            justify-content: space-around;
+            padding: 0 .2em;
+            text-align: center;
+            width: 5em;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .star-rating :checked ~ label {
+            color: #f90;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #fc0;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de l'affichage du champ de commentaire
+            document.querySelectorAll('.star-rating input[type="radio"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const reponseId = this.id.split('-')[1];
+                    const commentaireContainer = document.getElementById('commentaire-container-' + reponseId);
+                    const commentaireField = document.getElementById('commentaire-' + reponseId);
+                    
+                    if (this.value <= 2) {
+                        commentaireContainer.style.display = 'block';
+                        commentaireField.required = true;
+                    } else {
+                        commentaireContainer.style.display = 'none';
+                        commentaireField.required = false;
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

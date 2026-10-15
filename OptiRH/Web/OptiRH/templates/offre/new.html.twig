@@ -1,0 +1,319 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Nouvelle offre | Gestion RH{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+
+    <!-- Quill CSS -->
+    <link href="{{ asset('/libs/quill/quill.core.css') }}" rel="stylesheet">
+    <link href="{{ asset('/libs/quill/quill.snow.css') }}" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link href="{{ asset('/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link href="{{ asset('/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+    <style>
+        .ql-container {
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+        .ql-toolbar {
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+        .invalid-feedback {
+            display: none;
+        }
+        .is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { page_title: 'Création offre' }) }}
+{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Formulaire de création d'offre</h4>
+
+                    {{ form_start(form, {'attr': {'class': 'parsley-examples', 'novalidate': 'novalidate', 'id': 'offreForm'}}) }}
+
+                    <!-- Erreurs globales du formulaire -->
+                    {% if form.vars.errors|length > 0 %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.vars.errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <!-- Poste -->
+                    <div class="mb-3">
+                        {{ form_label(form.poste, 'Poste à pourvoir', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.poste, {'attr': {
+                            'class': 'form-control' ~ (form.poste.vars.errors|length > 0 ? ' is-invalid' : ''),
+                            'placeholder': 'Ex: Développeur Symfony Senior'
+                        }}) }}
+                        {{ form_errors(form.poste, {'attr': {'class': 'invalid-feedback'}}) }}
+                    </div>
+
+                    <!-- Type Contrat + Localisation -->
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.typeContrat, 'Type de contrat', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.typeContrat, {'attr': {
+                                    'class': 'form-select' ~ (form.typeContrat.vars.errors|length > 0 ? ' is-invalid' : '')
+                                }}) }}
+                                {{ form_errors(form.typeContrat, {'attr': {'class': 'invalid-feedback'}}) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.localisation, 'Localisation', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.localisation, {'attr': {
+                                    'class': 'form-control' ~ (form.localisation.vars.errors|length > 0 ? ' is-invalid' : '')
+                                }}) }}
+                                {{ form_errors(form.localisation, {'attr': {'class': 'invalid-feedback'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date Expiration + Nombre de postes -->
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.dateExpiration, 'Date expiration', {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.dateExpiration, {
+                                        'attr': {
+                                            'class': 'form-control flatpickr' ~ (form.dateExpiration.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                            'placeholder': 'Sélectionnez une date et heure',
+                                            'data-date-format': 'Y-m-d H:i'
+                                        }
+                                    }) }}
+                                    <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                </div>
+                                {{ form_errors(form.dateExpiration, {'attr': {'class': 'invalid-feedback'}}) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.nbPostes, 'Nombre de postes', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.nbPostes, {'attr': {
+                                    'class': 'form-control' ~ (form.nbPostes.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                    'data-parsley-type': 'digits',
+                                    'data-parsley-type-message': 'Veuillez entrer un nombre entier'
+                                }}) }}
+                                {{ form_errors(form.nbPostes, {'attr': {'class': 'invalid-feedback'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode de travail -->
+                    <div class="mb-3">
+                        {{ form_label(form.modeTravail, 'Mode de travail', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.modeTravail, {'attr': {
+                            'class': 'form-select' ~ (form.modeTravail.vars.errors|length > 0 ? ' is-invalid' : '')
+                        }}) }}
+                        {{ form_errors(form.modeTravail, {'attr': {'class': 'invalid-feedback'}}) }}
+                    </div>
+
+                    <!-- Date de création cachée -->
+                    {% if form.dateCreation is defined %}
+                        <div class="mb-3 d-none">
+                            {{ form_label(form.dateCreation) }}
+                            {{ form_widget(form.dateCreation) }}
+                            {{ form_errors(form.dateCreation, {'attr': {'class': 'invalid-feedback'}}) }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Statut -->
+                    <div class="mb-3">
+                        {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.statut, {
+                            'attr': {
+                                'class': 'form-select' ~ (form.statut.vars.errors|length > 0 ? ' is-invalid' : '')
+                            }
+                        }) }}
+                        {{ form_errors(form.statut, {'attr': {'class': 'invalid-feedback'}}) }}
+                    </div>
+
+                    <!-- Niveau d'expérience -->
+                    <div class="mb-3">
+                        {{ form_label(form.niveauExperience, 'Expérience requise', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.niveauExperience, {'attr': {
+                            'class': 'form-select' ~ (form.niveauExperience.vars.errors|length > 0 ? ' is-invalid' : '')
+                        }}) }}
+                        {{ form_errors(form.niveauExperience, {'attr': {'class': 'invalid-feedback'}}) }}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description détaillée', {'label_attr': {'class': 'form-label'}}) }}
+                        <div id="quill-editor" style="height: 300px;"></div>
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'd-none' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                'data-parsley-minlength': '10',
+                                'data-parsley-minlength-message': 'La description doit contenir au moins 10 caractères'
+                            }
+                        }) }}
+                        {{ form_errors(form.description, {'attr': {'class': 'invalid-feedback'}}) }}
+                    </div>
+
+                    <!-- Boutons de soumission -->
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="mdi mdi-content-save-check me-1"></i>
+                            Publier l'offre
+                        </button>
+                        <a href="{{ path('app_offre_index') }}" class="btn btn-light" id="cancelBtn">
+                            Annuler
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+{{ parent() }}
+<!-- Quill JS -->
+<script src="{{ asset('/libs/quill/quill.min.js') }}"></script>
+<!-- Flatpickr -->
+<script src="{{ asset('/libs/flatpickr/flatpickr.min.js') }}"></script>
+<script src="{{ asset('/libs/flatpickr/l10n/fr.js') }}"></script>
+<!-- Parsley -->
+<script src="{{ asset('/libs/parsleyjs/parsley.min.js') }}"></script>
+<script src="{{ asset('/libs/parsleyjs/i18n/fr.js') }}"></script>
+<!-- SweetAlert2 JS -->
+<script src="{{ asset('/libs/sweetalert2/sweetalert2.all.min.js') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialisation de Quill
+        const quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Rédigez votre description ici...'
+        });
+
+        const descriptionField = document.querySelector('#{{ form.description.vars.id }}');
+        quill.root.innerHTML = descriptionField.value || '';
+        quill.on('text-change', () => descriptionField.value = quill.root.innerHTML);
+
+        // Initialisation de Flatpickr
+        flatpickr('.flatpickr', {
+            enableTime: true,
+            time_24hr: true,
+            dateFormat: "Y-m-d H:i",
+            altInput: true,
+            altFormat: "d/m/Y H:i",
+            locale: "fr",
+            minDate: "today",
+            allowInput: true
+        });
+
+        // Configuration Parsley
+        window.Parsley.setLocale('fr');
+        window.Parsley.options.requiredMessage = ''; // Désactiver le message générique "Ce champ est requis"
+        window.Parsley.addValidator('experience', {
+            validateString: value => /^[0-9]+\s*ans?$/.test(value),
+            messages: { fr: 'Format attendu : "X ans"' }
+        });
+
+        // Gestion des erreurs Parsley
+        window.Parsley.on('field:error', function() {
+            this.$element.addClass('is-invalid');
+            // Ne pas définir de message ici, laisser Symfony gérer via form_errors
+        });
+
+        window.Parsley.on('field:success', function() {
+            this.$element.removeClass('is-invalid');
+            const errorContainer = this.$element.next('.invalid-feedback');
+            if (errorContainer.length) {
+                errorContainer.text('');
+            }
+        });
+
+        // Gestion de la soumission du formulaire avec SweetAlert
+        const form = document.getElementById('offreForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Validation avec Parsley
+            const parsleyForm = $(form).parsley();
+            if (!parsleyForm.isValid()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: 'Veuillez corriger les erreurs dans le formulaire.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Confirmation avant soumission
+            Swal.fire({
+                title: 'Confirmer la publication ?',
+                text: 'Voulez-vous vraiment publier cette offre ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, publier',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succès',
+                        text: 'L\'offre a été publiée avec succès !',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = "{{ path('app_offre_index') }}";
+                    });
+                }
+            });
+        });
+
+        // Gestion du bouton Annuler avec SweetAlert
+        document.getElementById('cancelBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Annuler ?',
+                text: 'Voulez-vous vraiment abandonner la création de cette offre ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, annuler',
+                cancelButtonText: 'Non, continuer'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ path('app_offre_index') }}";
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

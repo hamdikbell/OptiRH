@@ -1,0 +1,179 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block topbar %}
+        {{ include('partials/topbar.html.twig', { page_title: 'Mes Réservation' }) }}
+
+{% endblock %}
+{% block css %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/Evenement/frontevenement.css') }}">    
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .action-btn {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.875rem;
+        }
+        .action-icons i {
+            font-size: 1rem;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body %}
+<div class="row mb-3">
+            <div class="col-12">
+                <div class="event-header text-center py-5 position-relative overflow-hidden rounded-3">
+                    <div class="position-relative z-index-1">
+                        <h1 class="display-4 fw-bold text-white mb-3 animate__animated animate__fadeInDown">Mes Réservations</h1>
+                        <a href="{{ path('app_user_reservations') }}" class="btn btn-light rounded-pill px-4 mt-3 animate__animated animate__fadeIn animate__delay-1s">
+                            <i class="mdi mdi-ticket-account me-1"></i> Mes Réservations
+                        </a>
+                    </div>
+                </div>
+            </div>
+<div class="container-fluid px-4">
+    <div class="row mt-3">
+        <div class="col-12">
+            {% for message in app.flashes('modifiee') %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('erreur') %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('réservation') %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('Impossibleréservation') %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-end">
+                <a href="{{ path('app_evenement_indexfront') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Retour aux événements
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Événement</th>
+                                    <th>Date de début</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               {% if reservations|length > 0 %}
+                                    {% for reservation in reservations %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ reservation.evenement.titre }}</strong><br>
+                                                <small class="text-muted">{{ reservation.evenement.type }}</small>
+                                            </td>
+                                            <td>
+                                                <strong> Du :{{ reservation.evenement.dateDebut|date('d/m/Y') }}</strong><br>
+                                                <small class="text-muted">Jusqu'a :{{ reservation.evenement.dateFin|date('d/m/Y') }}</small>
+                                            </td>
+                                            <td class="text-center action-icons">
+                                                <a href="{{ path('app_reservation_pdf', {'id': reservation.id}) }}" class="btn btn-sm btn-outline-danger action-btn me-1" title="Télécharger PDF">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+
+                                               
+                                                <a href="{{ path('app_reservation_evenement_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-outline-warning action-btn me-1" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+
+                                                
+                                                <form method="post" action="{{ path('app_reservation_evenement_delete', {'id': reservation.id}) }}" id="delete-form-{{ reservation.id }}" style="display:inline;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                                    <button class="btn btn-sm btn-outline-danger action-btn" title="Supprimer"onclick="confirmDelete(event, {{ reservation.id }})">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                                                <p class="mb-0">Aucune réservation trouvée</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    <!-- Inclure SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+     <script>
+        // Fonction pour la confirmation de suppression
+        function confirmDelete(event, reservationId) {
+            event.preventDefault();
+            const form = document.getElementById('delete-form-' + reservationId);
+            
+            Swal.fire({
+                title: 'Confirmation d\'annulation',
+                text: "Êtes-vous sûr de vouloir annuler cette réservation ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Oui, annuler',
+                cancelButtonText: 'Non, garder',
+                buttonsStyling: true,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
+{% endblock %}
+{% endblock %}

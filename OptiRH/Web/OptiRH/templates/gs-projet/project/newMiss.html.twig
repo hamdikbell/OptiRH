@@ -1,0 +1,208 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Nouvelle mission{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', {
+        page_title: 'Créer une nouvelle mission',
+        breadcrumb: [
+            { label: 'Projets', path: path('gs-projet_project_index') },
+            { label: 'Missions', path: path('gs-projet_project_missions_index', {'id': project.id}) },
+            { label: 'Créer' }
+        ]
+    }) }}
+{% endblock %}
+
+{% block body %}
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Formulaire de création</h4>
+                <p class="sub-header">Tous les champs marqués d'une astérisque (*) sont obligatoires</p>
+
+                {{ include('gs-projet/project/_formMiss.html.twig', {form: form, project: project}) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/libs/flatpickr/flatpickr.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .input-with-icon {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 10px;
+            top: 36px;
+            color: #6c757d;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .input-with-icon .form-control {
+            padding-left: 2.5rem;
+        }
+        .flatpickr-date {
+            padding-left: 2.5rem !important;
+        }
+        .flatpickr-calendar {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .flatpickr-day.selected {
+            background: #3b5de7;
+            border-color: #3b5de7;
+        }
+        .flatpickr-day.today {
+            border-color: #3b5de7;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="/libs/parsleyjs/parsley.min.js"></script>
+    <script src="/libs/parsleyjs/i18n/fr.js"></script>
+    <script src="/libs/flatpickr/flatpickr.min.js"></script>
+    <script src="/libs/flatpickr/l10n/fr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      $(document).ready(function() {
+    // Configuration Flatpickr
+    flatpickr('.flatpickr-date', {
+        dateFormat: 'd/m/Y',
+        locale: 'fr',
+        minDate: 'today',
+        defaultDate: new Date().fp_incr(1), // Date de demain par défaut
+        allowInput: true,
+        onClose: function(selectedDates, dateStr, instance) {
+            // Validation manuelle après sélection
+            $(instance.element).parsley().validate();
+        }
+    });
+
+    // Validateur personnalisé Parsley pour la date
+    window.Parsley.addValidator('dateAfterToday', {
+        validateString: function(value) {
+            if (!value) return false;
+            
+            try {
+                const [day, month, year] = value.split('/');
+                const inputDate = new Date(year, month - 1, day);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return inputDate > today;
+            } catch (e) {
+                return false;
+            }
+        },
+        messages: {
+            fr: "La date doit être postérieure à aujourd'hui"
+        }
+    });
+
+    // Initialisation Parsley
+    $('form').parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        errorsWrapper: '<div class="invalid-feedback"></div>',
+        errorTemplate: '<span></span>',
+        trigger: 'change focusout',
+        excluded: 'input[type=hidden]'
+    });
+
+            // Configuration Select2
+            $('#mission_assignedTo').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Sélectionnez un utilisateur',
+                allowClear: true,
+                language: 'fr',
+                width: '100%'
+            });
+
+            // Validation Parsley
+            $('form').parsley({
+                errorClass: 'is-invalid',
+                successClass: 'is-valid',
+                errorsWrapper: '<div class="invalid-feedback"></div>',
+                errorTemplate: '<span></span>',
+                trigger: 'change',
+                excluded: 'input[type=hidden]'
+            });
+
+            window.Parsley.setLocale('fr');
+
+            // Gestion AJAX du formulaire
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                
+                if (!$(this).parsley().validate()) {
+                    return;
+                }
+
+                const submitButton = $(this).find('button[type="submit"]');
+                const originalText = submitButton.html();
+                submitButton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enregistrement...');
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Mission créée',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                willClose: () => {
+                                    window.location.href = response.redirect;
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            title: 'Erreur',
+                            text: xhr.responseJSON?.error || 'Une erreur est survenue',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                    complete: function() {
+                        submitButton.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Gestion des messages flash
+            {% for message in app.flashes('success') %}
+                Swal.fire({
+                    title: 'Succès',
+                    text: '{{ message }}',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "{{ path('gs-projet_project_show', {'id': project.id}) }}";
+                });
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

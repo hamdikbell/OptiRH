@@ -1,0 +1,188 @@
+{% extends 'partials/layout-vertical.html.twig' %}
+
+{% block title %}Détails de l'Événement • Réservations{% endblock %}
+
+{% block topbar %}
+    {{ include('partials/topbar.html.twig', { 
+        page_title: 'Réservations pour ' ~ evenement.titre,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    }) }}
+{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+        <span class="badge rounded-pill bg-primary p-2 me-2">
+            <i class="mdi mdi-ticket-confirmation-outline me-1"></i>
+            {{ reservations|length }} réservation(s)
+        </span>
+        <span class="badge rounded-pill bg-soft-primary p-2">
+            <i class="mdi mdi-calendar-check me-1"></i>
+            {{ evenement.dateDebut|date('d/m/Y') }}
+        </span>
+    </div>
+    
+    <a href="{{ path('app_evenement_index') }}" class="btn btn-outline-primary rounded-pill">
+        <i class="mdi mdi-arrow-left me-1"></i> Retour aux événements
+    </a>
+</div>
+
+<!-- Section Détails de l'événement -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="row">
+            <!-- Colonne Image -->
+            <div class="col-md-4 mb-4 mb-md-0">
+               <div class="position-relative">
+                    <div class="image-container" style="width: 100%; height: 250px; overflow: hidden; border-radius: 0.5rem;">
+                        <img src="{{ asset(evenement.image) }}" 
+                            class="img-fluid h-100 w-100 object-fit-cover" 
+                            alt="{{ evenement.titre }}"
+                            style="object-position: center;">
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-{{ evenement.type == 'En ligne' ? 'success' : 'info' }}">
+                            {{ evenement.type }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Colonne Détails -->
+            <div class="col-md-8">
+                <h3 class="mb-3">{{ evenement.titre }}</h3>
+                
+                <div class="mb-3">
+                    <p class="text-muted mb-2">{{ evenement.description }}</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-map-marker-outline text-primary me-2"></i>
+                            <span>{{ evenement.lieu }}</span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-calendar-clock-outline text-primary me-2"></i>
+                            <span>
+                                {{ evenement.dateDebut|date('d/m/Y H:i') }} - 
+                                {{ evenement.dateFin|date('H:i') }}
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-account-multiple text-primary me-2"></i>
+                            <span>
+                                {{ evenement.nbrPersonnes }} personne(s)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-cash text-primary me-2"></i>
+                            <span>
+                                {% if evenement.prix > 0 %}
+                                    {{ evenement.prix }} €
+                                {% else %}
+                                    Gratuit
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-account-group-outline text-primary me-2"></i>
+                            <span>{{ evenement.modalite }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% if reservations is empty %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center py-5">
+            <div class="avatar-md mx-auto mb-4">
+                <div class="avatar-title bg-soft-primary text-primary rounded-circle">
+                    <i class="mdi mdi-ticket-account h1"></i>
+                </div>
+            </div>
+            <h4 class="text-muted">Aucune réservation pour cet événement</h4>
+            <p class="text-muted mb-4">Les réservations apparaîtront ici lorsqu'elles seront effectuées.</p>
+            <a href="#" class="btn btn-primary rounded-pill">
+                <i class="mdi mdi-share-variant me-1"></i> Partager l'événement
+            </a>
+        </div>
+    </div>
+{% else %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive rounded">
+            <table class="table table-hover table-borderless mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4 rounded-start">Nom et Prenom</th>
+                        <th>Contact</th>
+                        <th>Date Réservation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for reservation in reservations %}
+                    <tr class="border-top">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-xs me-3">
+                                    <span class="avatar-title bg-soft-primary rounded-circle">
+                                        {{ reservation.firstName|first|upper }}{{ reservation.lastName|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ reservation.firstName }} {{ reservation.lastName }}</h6>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <span class="d-block">{{ reservation.email }}</span>
+                                <small class="text-muted">{{ reservation.telephone }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="mdi mdi-calendar-blank-outline text-muted me-2"></i>
+                                {{ reservation.dateReservation|date('d/m/Y H:i') }}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-light border-top">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Affichage de <span class="fw-semibold">1</span> à <span class="fw-semibold">{{ reservations|length }}</span> 
+                sur <span class="fw-semibold">{{ reservations|length }}</span> réservations
+            </div>
+            <ul class="pagination pagination-separated pagination-sm mb-0">
+                <li class="page-item disabled">
+                    <a href="#" class="page-link">←</a>
+                </li>
+                <li class="page-item active">
+                    <a href="#" class="page-link">1</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">→</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
